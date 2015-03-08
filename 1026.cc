@@ -4,15 +4,13 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
-
 using namespace std;
-
 struct Player {
-	int at, h, m, s;	// arrived time
-	int pt;				// playing time
+	int at, h, m, s; // arrived time
+	int pt; // playing time
 };
 struct Table {
-	int id, ft;		// free time
+	int id, ft; // free time
 	bool vip;
 	Table():id(0), ft(0), vip(false) {}
 	Table(int id, int ft, bool vip) : id(id), ft(ft), vip(vip) {}
@@ -21,14 +19,11 @@ bool operator< (const Player &p1, const Player &p2)
 {
 	return p1.at < p2.at;
 }
-
 vector<Player> vpy, vvippy;
 vector<Table> vt;
-bool vipt[101];	// vip tables
-int csp[101];	// count the number of served players by each table
-
+bool vipt[101]; // vip tables
+int csp[101]; // count the number of served players by each table
 const int OPEN_TIME=8*3600, CLOSED_TIME=21*3600, TIME_LIMIT=2*3600;
-
 void process(void)
 {
 	vector<Player>::iterator plyit, vpyit=vpy.begin(), vvippyit=vvippy.begin();
@@ -50,8 +45,13 @@ void process(void)
 		if(vtit->ft >= CLOSED_TIME && vtvipit->ft >= CLOSED_TIME)
 			break;
 		// choose a table and a player
-			// a special case
-		if(vvippyit != vvippy.end() && vtit->ft == vtvipit->ft && vtit->id < vtvipit->id) {
+		/* Actually, the branches should be parted like this:
+		 * 1. both normal tables and vip tables are free now
+		 * 2. only vip tables are free now
+		 * 3. only normal tables are free now
+		 */
+		if(vvippyit != vvippy.end() && vvippyit->at <= vtvipit->ft\		// players should not arrived after table is free
+				&& vtit->ft == vtvipit->ft && vtit->id < vtvipit->id) {	// a special case
 			plyit = vvippyit++; tblit = vtvipit;
 		}
 		else {
@@ -59,7 +59,8 @@ void process(void)
 				tblit = vtvipit;
 			else
 				tblit = vtit;
-			if(vvippyit!=vvippy.end() && (vpyit==vpy.end() || vpyit->at > vvippyit->at || vipt))
+			if(vvippyit!=vvippy.end() && (vpyit==vpy.end() || vpyit->at > vvippyit->at\
+						|| (tblit==vtvipit && vvippyit->at <= tblit->ft) ))
 				plyit = vvippyit++;
 			else
 				plyit = vpyit++;
@@ -78,7 +79,6 @@ void process(void)
 		}
 	}
 }
-
 int main(void)
 {
 #ifdef DEBUG
@@ -93,19 +93,13 @@ int main(void)
 		scanf("%d:%d:%d %d %d", &py.h, &py.m, &py.s, &py.pt, &vip);
 		py.at = py.h*3600 + py.m*60 + py.s;
 		if(py.at >= CLOSED_TIME) continue;
-
 		py.pt *= 60;
 		if(py.pt > TIME_LIMIT) py.pt = TIME_LIMIT;
-
 		if(vip) vvippy.push_back(py);
 		else vpy.push_back(py);
 	}
 	sort(vpy.begin(), vpy.end());
 	sort(vvippy.begin(), vvippy.end());
-	for(auto vpym : vpy)
-		printf("%d 0\n", vpym.at);
-	for(auto vvippym : vvippy)
-		printf("%d 1\n", vvippym.at);
 	// read tables
 	scanf("%d%d", &k, &m);
 	int t;
@@ -118,11 +112,9 @@ int main(void)
 	// in case there's no non-vip table or vip table
 	vt.push_back(Table(0, CLOSED_TIME, false));
 	vt.push_back(Table(0, CLOSED_TIME, true));
-
 	process();
 	printf("%d", csp[1]);
 	for(int idx=2; idx<=k; ++idx)
 		printf(" %d", csp[idx]);
-
 	return 0;
 }
