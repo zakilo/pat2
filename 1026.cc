@@ -50,7 +50,7 @@ void process(void)
 		 * 2. only vip tables are free now
 		 * 3. only normal tables are free now
 		 */
-		if(vvippyit != vvippy.end() && vvippyit->at <= vtvipit->ft\		// players should not arrived after table is free
+		if(vvippyit != vvippy.end() && vvippyit->at <= vtvipit->ft		// players should not arrived after table is free
 				&& vtit->ft == vtvipit->ft && vtit->id < vtvipit->id) {	// a special case
 			plyit = vvippyit++; tblit = vtvipit;
 		}
