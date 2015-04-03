@@ -1,6 +1,6 @@
 SRCS = $(wildcard *.cc)
 PROGS = $(patsubst %.cc,%,$(SRCS))
-CFLAGS = -DDEBUG -g -std=c++11
+CFLAGS = -Wall -DDEBUG -g -std=c++11
 
 all: $(PROGS)
 
